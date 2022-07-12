@@ -1,32 +1,31 @@
-import { PrismaClient } from '@prisma/client';
+// import { PrismaClient } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
-import { Body, HttpCode, JsonController, Post } from 'routing-controllers';
+import { Body, HeaderParam, HttpCode, JsonController, Post, UseBefore } from 'routing-controllers';
 
+import { MessagesPostRequest } from '@application/messages/messages.post.request';
+import { MessagesPostResponse } from '@application/messages/messages.post.response';
+import { MessagesPostUseCase } from '@application/messages/messages.post.usecase';
 import { tokenProvider } from '@presentation/authentication';
-import { UserNotFoundError } from '@presentation/errors/user-not-found.error';
-
-import { PostMessageUseCase } from './post.usecase';
-
-const prisma = new PrismaClient();
+import { AuthenticationMiddleware } from '@presentation/middlewares';
 
 @JsonController('/messages')
 class MessagesController {
+  private messagesPostUseCase: MessagesPostUseCase;
+
+  constructor(messagesPostUseCase: MessagesPostUseCase) {
+    this.messagesPostUseCase = messagesPostUseCase;
+  }
+
   @Post()
   @HttpCode(StatusCodes.CREATED)
-  async post(@Body() message: PostMessageUseCase): Promise<null> {
-    const user = await prisma.user.findFirst({
-      where: {
-        name: usecase.name,
-      },
-    });
+  @UseBefore(AuthenticationMiddleware)
+  async post(
+    @Body() body: { message: string; name: string },
+    @HeaderParam('Authorization') authHeader: string
+  ): Promise<MessagesPostResponse> {
+    const token = tokenProvider.getTokenFromHeader(authHeader);
 
-    if (user === null || usecase.password !== user.password) {
-      throw new UserNotFoundError();
-    } else {
-      return new LoginResponse(
-        tokenProvider.createAccessToken(user.id, user.name).token
-      );
-    }
+    return this.messagesPostUseCase.execute(new MessagesPostRequest(body.name, body.message, token));
   }
 }
 

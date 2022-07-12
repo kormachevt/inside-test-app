@@ -1,5 +1,5 @@
-class LoginUseCase {
+class LoginRequest {
   constructor(readonly name: string, readonly password: string) {}
 }
 
-export { LoginUseCase };
+export { LoginRequest };

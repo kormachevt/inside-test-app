@@ -5,8 +5,8 @@ import { Body, HttpCode, JsonController, Post } from 'routing-controllers';
 import { tokenProvider } from '@presentation/authentication';
 import { UserNotFoundError } from '@presentation/errors/user-not-found.error';
 
+import { LoginRequest } from './login.request';
 import { LoginResponse } from './login.response';
-import { LoginUseCase } from './login.usecase';
 
 const prisma = new PrismaClient();
 
@@ -14,14 +14,14 @@ const prisma = new PrismaClient();
 class AuthenticationController {
   @Post('/login')
   @HttpCode(StatusCodes.OK)
-  async login(@Body() usecase: LoginUseCase): Promise<LoginResponse> {
+  async login(@Body() request: LoginRequest): Promise<LoginResponse> {
     const user = await prisma.user.findFirst({
       where: {
-        name: usecase.name
+        name: request.name
       }
     });
 
-    if (user === null || usecase.password !== user.password) {
+    if (user === null || request.password !== user.password) {
       throw new UserNotFoundError();
     } else {
       return new LoginResponse(tokenProvider.createAccessToken(user.id, user.name).token);

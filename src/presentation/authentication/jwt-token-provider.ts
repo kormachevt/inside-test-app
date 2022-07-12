@@ -25,11 +25,11 @@ class JwtTokenProvider implements TokenProvider {
   }
 
   validateAccessToken(token: string): boolean {
-    return this.validateToken(TokenType.ACCESS, token);
+    return this.validateToken(token);
   }
 
   validateRefreshToken(token: string): boolean {
-    return this.validateToken(TokenType.REFRESH, token);
+    return this.validateToken(token);
   }
 
   parseToken(token: string): Token | undefined {
@@ -58,12 +58,12 @@ class JwtTokenProvider implements TokenProvider {
     return new Token(type, jwtToken, exp, userId, name);
   }
 
-  private validateToken(targetType: TokenType, token: string) {
+  private validateToken(token: string) {
     try {
-      const { type } = <any>jwt.verify(token, this.jwtSecret, {
+      const { name } = <any>jwt.verify(token, this.jwtSecret, {
         algorithms: [this.jwtAlgorithm]
       });
-      return type === targetType;
+      return name.length > 0;
     } catch {
       return false;
     }
