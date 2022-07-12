@@ -2,6 +2,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { Body, HeaderParam, HttpCode, JsonController, Post, UseBefore } from 'routing-controllers';
 
+import { MessagesGetResponse } from '@application/messages/messages.get.response';
 import { MessagesPostRequest } from '@application/messages/messages.post.request';
 import { MessagesPostResponse } from '@application/messages/messages.post.response';
 import { MessagesPostUseCase } from '@application/messages/messages.post.usecase';
@@ -22,7 +23,7 @@ class MessagesController {
   async post(
     @Body() body: { message: string; name: string },
     @HeaderParam('Authorization') authHeader: string
-  ): Promise<MessagesPostResponse> {
+  ): Promise<MessagesPostResponse | MessagesGetResponse> {
     const token = tokenProvider.getTokenFromHeader(authHeader);
 
     return this.messagesPostUseCase.execute(new MessagesPostRequest(body.name, body.message, token));

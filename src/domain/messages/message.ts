@@ -7,11 +7,14 @@ class Message {
 
   readonly id: string;
 
-  constructor(name: string, message: string, userId: string, id: string) {
+  readonly createdAt: Date;
+
+  constructor(name: string, message: string, userId: string, id: string, createdAt: Date) {
     this.name = name;
     this.message = message;
     this.userId = userId;
     this.id = id;
+    this.createdAt = createdAt;
   }
 }
 
