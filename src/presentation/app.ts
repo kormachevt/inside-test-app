@@ -15,7 +15,7 @@ import swaggerUiExpress from 'swagger-ui-express';
 import { LOGGER } from '@domain/shared';
 import { GlobalConfig } from '@infrastructure/shared/config';
 
-import { checkRole, checkUser } from './authentication';
+import { checkUser } from './authentication';
 import { AppConfig, AppInfo } from './config/app.config';
 import { AuthenticationController } from './controllers/authentication';
 import { HealthController } from './controllers/health';
@@ -108,7 +108,6 @@ class App {
       routePrefix: this.basePath,
       controllers: [AuthenticationController, HealthController],
       middlewares: [MorganMiddleware, NotFoundMiddleware, ErrorHandlerMiddleware],
-      authorizationChecker: checkRole,
       currentUserChecker: checkUser,
       defaultErrorHandler: false
     });

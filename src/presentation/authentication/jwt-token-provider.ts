@@ -14,14 +14,14 @@ class JwtTokenProvider implements TokenProvider {
 
   private readonly jwtRefreshExpiration: number = AppConfig.JWT_REFRESH_EXPIRATION;
 
-  createAccessToken(userId: number | string, username: string, email: string, roles: string[]): Token {
+  createAccessToken(userId: number | string, name: string): Token {
     const expiration = this.getAccessTokenExpiration();
-    return this.createToken(TokenType.ACCESS, expiration, userId, username, email, roles);
+    return this.createToken(TokenType.ACCESS, expiration, userId, name);
   }
 
-  createRefreshToken(userId: string | number, username: string, email: string): Token {
+  createRefreshToken(userId: string | number, name: string): Token {
     const expiration = this.getRefreshTokenExpiration();
-    return this.createToken(TokenType.REFRESH, expiration, userId, username, email);
+    return this.createToken(TokenType.REFRESH, expiration, userId, name);
   }
 
   validateAccessToken(token: string): boolean {
@@ -34,10 +34,10 @@ class JwtTokenProvider implements TokenProvider {
 
   parseToken(token: string): Token | undefined {
     try {
-      const { type, userId, username, email, roles, exp } = <any>jwt.verify(token, this.jwtSecret, {
+      const { type, userId, name, exp } = <any>jwt.verify(token, this.jwtSecret, {
         algorithms: [this.jwtAlgorithm]
       });
-      return new Token(type, token, exp, userId, username, email, roles);
+      return new Token(type, token, exp, userId, name);
     } catch {
       return undefined;
     }
@@ -50,18 +50,12 @@ class JwtTokenProvider implements TokenProvider {
     return '';
   }
 
-  private createToken(
-    type: TokenType,
-    exp: number,
-    userId: number | string,
-    username: string,
-    email: string,
-    roles?: string[]
-  ) {
-    const jwtToken = jwt.sign({ type, userId, username, email, roles, exp }, this.jwtSecret, {
-      algorithm: this.jwtAlgorithm
+  private createToken(type: TokenType, exp: number, userId: number | string, name: string) {
+    const jwtToken = jwt.sign({ name }, this.jwtSecret, {
+      algorithm: this.jwtAlgorithm,
+      noTimestamp: true
     });
-    return new Token(TokenType.ACCESS, jwtToken, exp, userId, username, email, roles);
+    return new Token(type, jwtToken, exp, userId, name);
   }
 
   private validateToken(targetType: TokenType, token: string) {

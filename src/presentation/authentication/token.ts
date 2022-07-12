@@ -11,9 +11,7 @@ class Token {
     public readonly token: string,
     public readonly expiration: number,
     public readonly userId: number | string,
-    public readonly username: string,
-    public readonly email: string,
-    public readonly roles?: string[]
+    public readonly name: string
   ) {}
 
   public isExpired(): boolean {
