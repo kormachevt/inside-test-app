@@ -44,7 +44,7 @@ build/prod: ## Build production environment
 build/dev build/prod:
 	@echo "📦 Building project Docker image..."
 	@sed -i 's/DB_HOST=localhost/DB_HOST=db/g' .env
-	@docker build --build-arg PORT=$(PORT) --target $(ENVIRONMENT) -t $(APP_NAME):$(TAG) -f ./docker/Dockerfile .
+	@docker build --build-arg PORT=$(PORT) --target $(ENVIRONMENT) -t $(ACCOUNT_NAME)/$(APP_NAME):$(TAG) -f ./docker/Dockerfile .
 	@sed -i 's/DB_HOST=db/DB_HOST=localhost/g' .env
 
 .PHONY: start/dev

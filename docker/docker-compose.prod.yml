@@ -2,13 +2,7 @@ version: '3.7'
 
 services:
   base-app:
-    build:
-      context: ..
-      args:
-        - PORT=${PORT}
-      dockerfile: ./docker/Dockerfile
-      target: prod
-    image: ${APP_NAME}:prod
+    image: ${ACCOUNT_NAME}/${APP_NAME}:prod
     container_name: ${APP_NAME}
     restart: always
     depends_on:
