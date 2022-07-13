@@ -43,18 +43,28 @@ build/dev: ## Build development environment
 build/prod: ## Build production environment
 build/dev build/prod:
 	@echo "📦 Building project Docker image..."
+	@sed -i 's/DB_HOST=localhost/DB_HOST=db/g' .env
 	@docker build --build-arg PORT=$(PORT) --target $(ENVIRONMENT) -t $(APP_NAME):$(TAG) -f ./docker/Dockerfile .
+	@sed -i 's/DB_HOST=db/DB_HOST=localhost/g' .env
 
 .PHONY: start/dev
 start/dev: ## Start application in development mode
 	@echo "▶️ Starting app in development mode (Docker)..."
+	@sed -i 's/DB_HOST=localhost/DB_HOST=db/g' .env
 	@docker-compose -f ./docker/docker-compose.$(ENVIRONMENT).yml --env-file .env up --build
+	@sed -i 's/DB_HOST=db/DB_HOST=localhost/g' .env	
+	@npx prisma db push
+	@npx prisma db seed
 
 .PHONY: start/prod
 start/prod: ## Start application in production mode
 	@echo "▶️ Starting app in production mode (Docker)..."
 	@mkdir -p -m 755 ${LOGS_VOLUME}
+	@sed -i 's/DB_HOST=localhost/DB_HOST=db/g' .env
 	@docker-compose -f ./docker/docker-compose.$(ENVIRONMENT).yml --env-file .env up -d --build
+	@sed -i 's/DB_HOST=db/DB_HOST=localhost/g' .env
+	@npx prisma db push
+	@npx prisma db seed
 
 .PHONY: start/db
 start/db: ## Start database container

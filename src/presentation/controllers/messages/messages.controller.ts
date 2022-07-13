@@ -1,4 +1,3 @@
-// import { PrismaClient } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { Body, HeaderParam, HttpCode, JsonController, Post, UseBefore } from 'routing-controllers';
 
