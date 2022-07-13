@@ -2,8 +2,9 @@ import { Message } from '@domain/messages/message';
 
 interface MessageDto {
   id: string;
+  name: string;
   text: string;
-  createdAt: Date;
+  created_at: Date;
 }
 
 class MessagesGetResponse {
@@ -15,7 +16,12 @@ class MessagesGetResponse {
 
   public static fromDomainModel(messages: Message[]): MessagesGetResponse {
     const transformedMessages = messages.map(m => {
-      return { id: m.id, text: m.message, createdAt: m.createdAt };
+      return {
+        id: m.id,
+        name: m.name,
+        text: m.message,
+        created_at: m.createdAt
+      };
     });
     return { messages: transformedMessages };
   }
