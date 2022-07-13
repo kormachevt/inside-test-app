@@ -1,70 +1,31 @@
+import { PrismaClient } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
-import { Authorized, BodyParam, CurrentUser, Get, HttpCode, JsonController, UseBefore } from 'routing-controllers';
+import { Body, HttpCode, JsonController, Post } from 'routing-controllers';
 
 import { tokenProvider } from '@presentation/authentication';
-import { Token } from '@presentation/authentication/token';
-import { AuthenticationMiddleware } from '@presentation/middlewares/authentication.middleware';
+import { UserNotFoundError } from '@presentation/errors/user-not-found.error';
 
+import { LoginRequest } from './login.request';
 import { LoginResponse } from './login.response';
+
+const prisma = new PrismaClient();
 
 @JsonController('/auth')
 class AuthenticationController {
-  @Get('/login')
+  @Post('/login')
   @HttpCode(StatusCodes.OK)
-  login(): LoginResponse {
-    const user: any = {
-      userId: 1,
-      username: 'MrMars',
-      email: 'mrmars@machine.space',
-      roles: ['admin']
-    };
+  async login(@Body() request: LoginRequest): Promise<LoginResponse> {
+    const user = await prisma.user.findFirst({
+      where: {
+        name: request.name
+      }
+    });
 
-    return new LoginResponse(
-      user.userId,
-      user.username,
-      user.email,
-      user.roles,
-      tokenProvider.createAccessToken(user.userId, user.username, user.email, user.roles).token,
-      tokenProvider.createRefreshToken(user.userId, user.username, user.email).token
-    );
-  }
-
-  @Get('/refresh')
-  @HttpCode(StatusCodes.OK)
-  refreshToken(@BodyParam('refreshToken') refreshToken: string): LoginResponse | null {
-    const isRefreshTokenValid = tokenProvider.validateRefreshToken(refreshToken);
-
-    if (isRefreshTokenValid) {
-      const user: any = {
-        userId: 1,
-        username: 'MrMars',
-        email: 'mrmars@machine.space',
-        roles: ['admin']
-      };
-      return new LoginResponse(
-        user.userId,
-        user.username,
-        user.email,
-        user.roles,
-        tokenProvider.createAccessToken(user.userId, user.username, user.email, user.roles).token,
-        refreshToken
-      );
+    if (user === null || request.password !== user.password) {
+      throw new UserNotFoundError();
+    } else {
+      return new LoginResponse(tokenProvider.createAccessToken(user.id, user.name).token);
     }
-    return null;
-  }
-
-  @Get('/protected')
-  @UseBefore(AuthenticationMiddleware)
-  @Authorized(['admin'])
-  @HttpCode(StatusCodes.OK)
-  protected(@CurrentUser() user?: Token): any {
-    return {
-      userId: user?.userId,
-      username: user?.username,
-      email: user?.email,
-      roles: user?.roles,
-      expiration: user?.expiration
-    };
   }
 }
 

@@ -15,10 +15,11 @@ import swaggerUiExpress from 'swagger-ui-express';
 import { LOGGER } from '@domain/shared';
 import { GlobalConfig } from '@infrastructure/shared/config';
 
-import { checkRole, checkUser } from './authentication';
+import { checkUser } from './authentication';
 import { AppConfig, AppInfo } from './config/app.config';
 import { AuthenticationController } from './controllers/authentication';
 import { HealthController } from './controllers/health';
+import { MessagesController } from './controllers/messages';
 import { ErrorHandlerMiddleware, MorganMiddleware, NotFoundMiddleware } from './middlewares';
 
 class App {
@@ -106,9 +107,8 @@ class App {
   private initializeApplication(): void {
     useExpressServer(this.app, {
       routePrefix: this.basePath,
-      controllers: [AuthenticationController, HealthController],
+      controllers: [AuthenticationController, HealthController, MessagesController],
       middlewares: [MorganMiddleware, NotFoundMiddleware, ErrorHandlerMiddleware],
-      authorizationChecker: checkRole,
       currentUserChecker: checkUser,
       defaultErrorHandler: false
     });

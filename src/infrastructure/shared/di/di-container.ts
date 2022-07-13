@@ -1,10 +1,13 @@
-import { asClass, AwilixContainer, createContainer, InjectionMode } from 'awilix';
+import { PrismaClient } from '@prisma/client';
+import { asClass, asValue, AwilixContainer, createContainer, InjectionMode } from 'awilix';
 import { useContainer } from 'routing-controllers';
 
 import { HealthCheckerUseCase } from '@application/health/health-checker.usecase';
+import { MessagesPostUseCase } from '@application/messages/messages.post.usecase';
 import { LOGGER } from '@domain/shared';
 import { AuthenticationController } from '@presentation/controllers/authentication';
 import { HealthController } from '@presentation/controllers/health/health.controller';
+import { MessagesController } from '@presentation/controllers/messages';
 import {
   AuthenticationMiddleware,
   ErrorHandlerMiddleware,
@@ -31,17 +34,24 @@ class DiContainer {
         MorganMiddleware,
         NotFoundMiddleware
       ]);
+      this.diContainer.register({
+        prisma: asValue(new PrismaClient())
+      });
 
       // Use cases
       this.registerSingletonClassWithCustomName([
         {
           name: 'healthCheckerUseCase',
           class: HealthCheckerUseCase
+        },
+        {
+          name: 'messagesPostUseCase',
+          class: MessagesPostUseCase
         }
       ]);
 
       // Controllers
-      this.registerSingletonClass([HealthController, AuthenticationController]);
+      this.registerSingletonClass([HealthController, AuthenticationController, MessagesController]);
 
       useContainer(new AwilixAdapter(this.diContainer, camelCaseClassNameMapper));
 

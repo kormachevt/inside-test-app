@@ -1,0 +1,54 @@
+### Login endpoint
+
+curl --location --request POST 'localhost:5000/api/auth/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Alice",
+    "password": "qwerty12345"
+}'
+
+### output:
+# {
+#     "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWxpY2UifQ.8nId6qAqyyoJtZWjedJHjuZ7CbbtvxFXuwOkGIGUqh5hZi-ClZkvg2Frw6dtQHsFgt9vhxfkJjNahZGgqLG4EQ"
+# }
+
+
+
+### Post message
+
+curl --location --request POST 'localhost:5000/api/messages' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWxpY2UifQ.8nId6qAqyyoJtZWjedJHjuZ7CbbtvxFXuwOkGIGUqh5hZi-ClZkvg2Frw6dtQHsFgt9vhxfkJjNahZGgqLG4EQ' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Alice",
+    "message": "Hello World!"
+}'
+
+### output:
+# {
+#     "id": "befe5eae-15a5-432f-98f4-1a0fe48a4fb5"
+# }
+
+
+### Get Message history
+curl --location --request POST 'localhost:5000/api/messages' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWxpY2UifQ.8nId6qAqyyoJtZWjedJHjuZ7CbbtvxFXuwOkGIGUqh5hZi-ClZkvg2Frw6dtQHsFgt9vhxfkJjNahZGgqLG4EQ' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Alice",
+    "message": "history 1"
+}'
+
+### output:
+# {
+#     "messages": [
+#         {
+#             "id": "55efa45a-b7e4-47dd-8493-e4b6f13e8a0a",
+#             "name": "Alice",
+#             "text": "Hello World!",
+#             "created_at": "2022-07-13T16:35:04.865Z"
+#         }
+#     ]
+# }
+
+

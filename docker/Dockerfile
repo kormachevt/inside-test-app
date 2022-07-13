@@ -21,12 +21,13 @@ RUN npm install --ignore-scripts --no-optional && npm cache clean --force
 ENV PATH /code/node_modules/.bin:$PATH
 WORKDIR /code/app
 COPY . ./
+RUN npx prisma generate
 RUN npm run build
 
 # Dev stage
 FROM builder as dev
 
-LABEL maintainer "Borja Paz Rodríguez (@borjapazr)"
+LABEL maintainer "Tim Kormachev (@wardroid)"
 
 ENV NODE_ENV=development
 ENV FORCE_COLOR=1
@@ -35,7 +36,7 @@ CMD /wait && npm run dev
 # Prod stage
 FROM node as prod
 
-LABEL maintainer "Borja Paz Rodríguez (@borjapazr)"
+LABEL maintainer "Tim Kormachev (@wardroid)"
 
 ENV NODE_ENV=production
 ENV FORCE_COLOR=1
@@ -48,5 +49,6 @@ COPY --chown=node:node package*.json ./docker/pm2/process.json ./
 RUN npm ci --production --ignore-scripts
 ENV PATH /home/node/app/node_modules/.bin:$PATH
 COPY --chown=node:node --from=builder /code/app/dist ./dist
+COPY --chown=node:node --from=builder /code/node_modules/.prisma ./node_modules/.prisma
 HEALTHCHECK --interval=30s --timeout=60s --start-period=10s --retries=3 CMD node ./dist/healthcheck.js
 CMD /wait && pm2-runtime ./process.json

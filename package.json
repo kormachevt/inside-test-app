@@ -163,6 +163,7 @@
     }
   },
   "prisma": {
+    "seed": "ts-node src/infrastructure/shared/persistence/prisma//seed.ts",
     "schema": "src/infrastructure/shared/persistence/prisma/schema.prisma"
   }
 }

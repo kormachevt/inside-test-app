@@ -1,5 +1,5 @@
 module.exports = {
-  '*.{js,ts}': [
+  '!(test/**/*,src/infrastructure/shared/persistence/prisma/seed.ts)*.{js,ts}': [
     'prettier --check --write --ignore-unknown',
     'eslint --cache --color --fix',
     () => 'tsc --pretty --noEmit'
