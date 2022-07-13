@@ -70,6 +70,8 @@ start/prod: ## Start application in production mode
 start/db: ## Start database container
 	@echo "▶️ Starting database (Docker)..."
 	@docker-compose -f ./docker/docker-compose.dev.yml --env-file .env up -d db adminer
+	@npx prisma db push
+	@npx prisma db seed
 
 PHONY: test/dev
 test/dev: build/dev ## Run tests in development mode
